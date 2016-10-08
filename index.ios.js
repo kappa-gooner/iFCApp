@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import LoginView from './Views/Login';
+import LoginView from './Views/LoginView';
 import CustomerView from './Views/CustomerView';
 import VendorView from './Views/VendorView';
 import CleanerView from './Views/CleanerView';
