@@ -12,6 +12,7 @@
         "no-console": 0,
         "comma-dangle": 0,
         "no-unused-vars": [1, {"vars": "local", "args": "none"}],
+        "global-require": 0,
         "react/forbid-prop-types": 1,
         "react/jsx-boolean-value": 1,
         "react/jsx-closing-bracket-location": 1,

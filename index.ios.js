@@ -12,14 +12,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import Login from './Login';
-import CustomerView from './CustomerView';
-import VendorView from './VendorView';
-import CleanerView from './CleanerView';
+import LoginView from './Views/Login';
+import CustomerView from './Views/CustomerView';
+import VendorView from './Views/VendorView';
+import CleanerView from './Views/CleanerView';
 
-import AuthService from './AuthService';
+import AuthService from './Services/AuthService';
 
-import  baseStyles from './Styles';
+import baseStyles from './Styles/Styles';
 
 const styles = Object.assign(baseStyles, {
     welcome: {
@@ -60,7 +60,7 @@ class iFCApp extends Component {
                 this.setLoginState({
                     user: authInfo.user,
                     userType: authInfo.userType,
-                })
+                });
             }
         });
     }
@@ -86,9 +86,10 @@ class iFCApp extends Component {
             return (
               <View style={styles.container}>
                 <ActivityIndicator
-                  animating={true}
-                  size="large"
-                  style={styles.loader} />
+                    animating = {true}
+                    size="large"
+                    style={styles.loader}
+                />
               </View>
             );
         }
@@ -122,7 +123,7 @@ class iFCApp extends Component {
             }
         } else {
             return (
-              <Login onLogin={this.onLogin} />
+              <LoginView onLogin={this.onLogin} />
             );
         }
     }
