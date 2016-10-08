@@ -8,6 +8,7 @@ import {
     TextInput,
     Picker,
     TouchableHighlight,
+    ActivityIndicator,
 } from 'react-native';
 
 const Item = Picker.Item;
@@ -64,14 +65,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 24,
     },
+    loader: {
+        marginTop: 20,
+    },
 });
 
 class Login extends Component {
-    state = {
-        customer: 'customer',
-        vendor: 'vendor',
-        cleaner: 'cleaner',
-    };
+    constructor(props) {
+        super(props);
+        this.indexPage = {
+            onLogin : props.onLogin,
+        };
+        this.state = {
+            showProgress: false,
+
+            // user type states
+            customer: 'customer',
+            vendor: 'vendor',
+            cleaner: 'cleaner',
+        };
+    }
 
     onValueChange = (key: string, value: string) => {
         const newState = {};
@@ -85,7 +98,8 @@ class Login extends Component {
               <Image source={require('./iFClogo.png')}
                   style={styles.logo}/>
               <Text style={styles.heading}>iFoodCourt</Text>
-              <TextInput style={styles.loginInput}
+              <TextInput onChangeText={(text) => this.setState({ username: text})}
+                         style={styles.loginInput}
                          placeholder="Your Name"/>
               <Text style={styles.info}>And you are?</Text>
               <Picker style={styles.picker}
@@ -96,11 +110,37 @@ class Login extends Component {
                       <Item label="Food stall Vendor" value="vendor" />
                       <Item label="Cleaning Staff" value="cleaner" />
               </Picker>
-              <TouchableHighlight style={styles.button}>
+              <TouchableHighlight onPress={this.onLoginPressed.bind(this)}
+                  style={styles.button}>
                   <Text style={styles.buttonText}>Log in</Text>
               </TouchableHighlight>
+              <ActivityIndicator
+                  animating={this.state.showProgress}
+                  size="large"
+                  style={styles.loader}
+              />
           </View>
         );
+    }
+
+    onLoginPressed() {
+        console.log('Attempting to log in with username ' + this.state.username);
+        console.log('Attempting to log in with customer type ' + this.state.customer);
+        this.setState({ showProgress: true });
+
+        const authService = require('./AuthService');
+        authService.login({
+            user: this.state.username,
+            userType: this.state.customer
+        }, (results) => {
+            this.setState(Object.assign({
+                showProgress: false
+            }, results));
+
+            if (results.success && this.props.onLogin) {
+                this.indexPage.onLogin();
+            }
+        });
     }
 }
 
