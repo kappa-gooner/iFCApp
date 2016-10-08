@@ -47,6 +47,21 @@ class AuthService {
             return cb(err);
         });
     }
+
+    logout(cb) {
+      AsyncStorage.multiRemove([
+          userKey,
+          userTypeKey
+      ], (err) => {
+          if (err) {
+              throw err;
+          }
+          return cb({ success: true });
+      })
+      .catch((err) => {
+          return cb(err);
+      });
+    }
 }
 
 module.exports = new AuthService();

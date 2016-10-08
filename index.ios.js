@@ -7,22 +7,21 @@
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
   Text,
   View,
   ActivityIndicator,
 } from 'react-native';
 
 import Login from './Login';
+import CustomerView from './CustomerView';
+import VendorView from './VendorView';
+import CleanerView from './CleanerView';
+
 import AuthService from './AuthService';
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
+import  baseStyles from './Styles';
+
+const styles = Object.assign(baseStyles, {
     welcome: {
         fontSize: 20,
         textAlign: 'center',
@@ -42,22 +41,44 @@ class iFCApp extends Component {
         this.state = {
             isLoggedIn: false,
             checkingAuth: true,
+            user: '',
+            userType: ''
         };
 
         this.onLogin = this.onLogin.bind(this);
+        this.onLogout = this.onLogout.bind(this);
     }
 
     componentDidMount() {
         AuthService.getUserInfo((err, authInfo) => {
             this.setState({
                 checkingAuth: false,
-                isLoggedIn: authInfo != null
+                isLoggedIn: authInfo != null,
             });
+
+            if (this.state.isLoggedIn) {
+                this.setLoginState({
+                    user: authInfo.user,
+                    userType: authInfo.userType,
+                })
+            }
         });
     }
 
-    onLogin() {
-        this.setState({ isLoggedIn: true });
+    onLogin(userInfo) {
+        this.setLoginState(userInfo);
+    }
+
+    setLoginState(userInfo) {
+        this.setState({
+            isLoggedIn: true,
+            user: userInfo.user,
+            userType: userInfo.userType,
+        });
+    }
+
+    onLogout() {
+        this.setState({ isLoggedIn: false });
     }
 
     render() {
@@ -73,11 +94,32 @@ class iFCApp extends Component {
         }
 
         if (this.state.isLoggedIn) {
-            return (
-              <View style={styles.container}>
-                <Text style={styles.welcome}>Logged in!</Text>
-              </View>
-            );
+            switch (this.state.userType) {
+                case 'customer':
+                  return (
+                    <CustomerView name={this.state.user}
+                        onLogout={this.onLogout}
+                    />
+                  );
+                case 'vendor':
+                  return (
+                    <VendorView name={this.state.user}
+                        onLogout={this.onLogout}
+                    />
+                  );
+                case 'cleaner':
+                  return (
+                    <CleanerView name={this.state.user}
+                        onLogout={this.onLogout}
+                    />
+                  );
+                default :
+                  return (
+                    <View style={styles.container}>
+                      <Text style={styles.welcome}>Logged in!</Text>
+                    </View>
+                  );
+            }
         } else {
             return (
               <Login onLogin={this.onLogin} />
