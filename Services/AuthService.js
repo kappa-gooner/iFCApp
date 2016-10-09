@@ -5,11 +5,10 @@ import {
 import _ from 'lodash';
 
 const userKey = 'user';
-const userTypeKey = 'type';
 
 class AuthService {
     getUserInfo(cb) {
-        AsyncStorage.multiGet([userKey, userTypeKey], (err, val) => {
+        AsyncStorage.multiGet([userKey], (err, val) => {
             if (err) {
                 return cb(err);
             }
@@ -17,26 +16,20 @@ class AuthService {
             if (!val) {
                 return cb();
             }
-
             const result = _.fromPairs(val);
 
             if (!result[userKey]) {
                 return cb();
             }
 
-            const userInfo = {
-                user: result[userKey],
-                userType: result[userTypeKey],
-            };
-
+            const userInfo = JSON.parse(result[userKey]);
             return cb(null, userInfo);
         });
     }
 
-    login(creds, cb) {
+    login(user, cb) {
         AsyncStorage.multiSet([
-                [userKey, creds.user],
-                [userTypeKey, creds.userType]
+            [userKey, JSON.stringify(user)] /*UserInfo*/
         ], (err) => {
             if (err) {
                 throw err;
@@ -50,8 +43,7 @@ class AuthService {
 
     logout(cb) {
       AsyncStorage.multiRemove([
-          userKey,
-          userTypeKey
+          userKey
       ], (err) => {
           if (err) {
               throw err;

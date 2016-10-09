@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import styles from '../Styles/Styles';
+import User from '../Models/User';
 
 const Item = Picker.Item;
 
@@ -40,10 +41,8 @@ class LoginView extends Component {
             this.setState({ showProgress: true });
 
             const authService = require('../Services/AuthService');
-            authService.login({
-                user: this.state.username,
-                userType: this.state.customer
-            }, (results) => {
+            const user = new User(this.state.username, this.state.customer);
+            authService.login(user, (results) => {
                 this.setState(Object.assign({
                     showProgress: false
                 }, results));

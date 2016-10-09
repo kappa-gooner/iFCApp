@@ -23,7 +23,7 @@ class CustomerView extends Component {
 
     componentDidMount() {
         BeaconsManager.initializeBeacons();
-        DeviceEventEmitter.addListener('beaconsDidRange', (data) => {
+        this.customerViewListener = DeviceEventEmitter.addListener('beaconsDidRange', (data) => {
             this.beaconsInRange(data);
         });
     }
@@ -65,6 +65,7 @@ class CustomerView extends Component {
     }
 
     onLogoutPressed() {
+        this.customerViewListener.remove();
         require('../Services/AuthService').logout((results) => {
             if (results.success && this.props.onLogout) {
                 this.props.onLogout();

@@ -50,16 +50,16 @@ class iFCApp extends Component {
     }
 
     componentDidMount() {
-        AuthService.getUserInfo((err, authInfo) => {
+        AuthService.getUserInfo((err, userInfo) => {
             this.setState({
                 checkingAuth: false,
-                isLoggedIn: authInfo != null,
+                isLoggedIn: userInfo != null,
             });
 
             if (this.state.isLoggedIn) {
                 this.setLoginState({
-                    user: authInfo.user,
-                    userType: authInfo.userType,
+                    user: userInfo.user,
+                    userType: userInfo.userType,
                 });
             }
         });
