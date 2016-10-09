@@ -37,7 +37,6 @@ class BeaconsManager {
 
         Beacons.startUpdatingLocation();
         Beacons.shouldDropEmptyRanges(true);
-        console.log('Successfully initialized beacons');
     }
 
     static getBeaconDistance(txPower, rssi) {
@@ -53,6 +52,20 @@ class BeaconsManager {
             const accuracy = ((0.89976) * Math.pow(ratio, 7.7095)) + 0.111;
             return accuracy;
         }
+    }
+
+    static getNearestBeacon(beaconData) {
+        let nearestBeacon;
+        let nearestBeaconsDistance = -1;
+        beaconData.forEach((beacon) => {
+            const distance = this.getBeaconDistance(-74, beacon.rssi);
+            if (distance > -1 &&
+                    (distance < nearestBeaconsDistance || nearestBeacon === undefined)) {
+                nearestBeacon = beacon;
+                nearestBeaconsDistance = distance;
+            }
+        });
+        return nearestBeacon;
     }
 }
 

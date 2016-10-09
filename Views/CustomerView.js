@@ -16,11 +16,11 @@ class CustomerView extends Component {
 
         this.state = {
             isBeaconRange: false,
-
             beaconRegion: '',
             beaconProximity: 'unknown',
         };
     }
+
     componentDidMount() {
         BeaconsManager.initializeBeacons();
         DeviceEventEmitter.addListener('beaconsDidRange', (data) => {
@@ -51,19 +51,15 @@ class CustomerView extends Component {
     beaconsInRange(beaconData) {
         if (beaconData) {
             if (beaconData.beacons && beaconData.beacons.length > 0) {
-                console.log('Number of beacons in range is: ' + beaconData.beacons.length);
-                beaconData.beacons.forEach((beacon) => {
-                    if ({}.hasOwnProperty.call(MyBeacons, beaconData.region.identifier)
-                        && beacon.accuracy > -1) {
-                        this.enteredRegion(beaconData);
-                        this.setState({
-                            beaconProximity: beacon.proximity,
-                        });
-                        // console.log(beacon.rssi);
-                        // console.log(beacon.major);
-                        // console.log(beacon.accuracy);
-                    }
-                });
+                const nearestBeacon = BeaconsManager.getNearestBeacon(beaconData.beacons);
+                if ({}.hasOwnProperty.call(MyBeacons, beaconData.region.identifier)
+                     && nearestBeacon) {
+                    this.enteredRegion(beaconData);
+                    this.setState({
+                        beaconProximity:
+                          Math.trunc(BeaconsManager.getBeaconDistance(-74, nearestBeacon.rssi)),
+                    });
+                }
             }
         }
     }
@@ -81,7 +77,7 @@ class CustomerView extends Component {
                 <View style={styles.container}>
                 <Text style={styles.heading}>Welcome to iFoodCourt {this.props.name}</Text>
                 <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
-                    this beacon is currently {this.state.beaconProximity}</Text>
+                    this beacon is currently {this.state.beaconProximity}m away!</Text>
                 <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
                     style={styles.logoutButton}
                 >
