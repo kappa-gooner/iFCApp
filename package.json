@@ -14,6 +14,7 @@
     "eslint-plugin-react": "^6.3.0",
     "lodash": "^4.16.4",
     "react": "15.3.2",
-    "react-native": "0.34.1"
+    "react-native": "0.34.1",
+    "react-native-ibeacon": "^0.6.0"
   }
 }
