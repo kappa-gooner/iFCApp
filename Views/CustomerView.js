@@ -82,10 +82,26 @@ class CustomerView extends Component {
 
     onDone(userState) {
         switch (userState) {
-        case UserStates.IN_RANGE:
-            // BeaconsManager.findEmptyTable();
+        case UserStates.IN_RANGE: {
+            BeaconsManager.findEmptyTable()
+                    .then((freeTable) => {
+                        if (freeTable) {
+                            const userInfo = this.props.userInfo;
+                            userInfo.table = freeTable.table;
+
+                            UserService.handleUserAction({
+                                Type: UserStates.SEATED,
+                                Payload: userInfo,
+                            });
+                        }
+                        else {
+                            // Unable to find free tables!!!
+                        }
+                    });
             break;
+        }
         case UserStates.SEATED:
+            console.log('Need to handle: ' + UserStates.SEATED);
             // 1) Simulate order
             // 2) Push 'order to vendors'
             // 3) Set state to 'ORDERED'

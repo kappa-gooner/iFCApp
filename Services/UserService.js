@@ -6,11 +6,15 @@ import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 
 const userKey = 'user';
+const usersTable = 'Users/';
 
 class UserService {
     static handleUserAction(action) {
         switch (action.Type) {
         case UserStates.IN_RANGE:
+            this.updateUserTable(action.Payload, action.Type);
+            break;
+        case UserStates.SEATED:
             this.updateUserTable(action.Payload, action.Type);
             break;
         default:
@@ -24,7 +28,7 @@ class UserService {
             const userData = userInfo;
             userData.state = newstate;
 
-            DBService.getDB().ref(userData.user).set({
+            DBService.getDB().ref(usersTable + userData.user).set({
                 user: userData,
             }).then(() => {
                 AsyncStorage.setItem(userKey, JSON.stringify(userData));

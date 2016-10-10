@@ -1,27 +1,10 @@
 import React from 'react';
-
 import Beacons from 'react-native-ibeacon';
 
-const MyBeacons = {
-    MrBeetroot: {
-        identifier: 'MrBeetroot',
-        uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FE6D',
-        major: 38763,
-        minor: 29448
-    },
-    MsCandy: {
-        identifier: 'MsCandy',
-        uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FE6D',
-        major: 55094,
-        minor: 49514,
-    },
-    DrLemon: {
-        identifier: 'DrLemon',
-        uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FE6D',
-        major: 52872,
-        minor: 45572,
-    },
-};
+import MyBeacons from '../Constants/BeaconsInfo';
+import DBService from './DBService';
+
+const BeaconsTable = 'Beacons/';
 
 class BeaconsManager {
     static initializeBeacons() {
@@ -71,6 +54,49 @@ class BeaconsManager {
     static isLocatorBeacon(identifier) {
         // Return if the beacon ranging is indeed a 'locator' beacon
         return (identifier === MyBeacons.MrBeetroot.identifier);
+    }
+
+    static findEmptyTable() {
+        return DBService.getDB().ref(BeaconsTable).once('value').then((snapshot) => {
+            const beacons = snapshot.val();
+            let freeBeacon;
+            Object.keys(beacons).forEach((identifier) => {
+                const beacon = beacons[identifier];
+
+                if (beacon.type === 'RESERVE' && beacon.state === 'FREE') {
+                    freeBeacon = beacon;
+                }
+            });
+
+            if (freeBeacon) {
+                this.updateBeaconTable(freeBeacon, 'OCCUPIED');
+            }
+            return freeBeacon;
+        })
+        .catch((error) => {
+            // Handle DB error
+        });
+    }
+
+    static updateBeaconTable(beaconInfo, newstate) {
+        try {
+            // Update user info here
+            const beaconData = beaconInfo;
+            beaconData.state = newstate;
+
+            DBService.getDB().ref(BeaconsTable + beaconData.identifier).set({
+                identifier: beaconData.identifier,
+                state: beaconData.state,
+                table: beaconData.table,
+                type: beaconData.type,
+            }).then(() => {
+                console.log('Beacon Table updated successfully!');
+            }).catch((err) => {
+                // Handle errors here
+            });
+        } catch (error) {
+              // Error saving data
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import _ from 'lodash';
 import DBService from './DBService';
 
 const userKey = 'user';
+const usersTable = 'Users/';
 
 class AuthService {
     getUserInfo(cb) {
@@ -24,7 +25,7 @@ class AuthService {
             }
             const userInfo = JSON.parse(result[userKey]);
 
-            DBService.getDB().ref(userInfo.user).once('value').then((snapshot) => {
+            DBService.getDB().ref(usersTable + userInfo.user).once('value').then((snapshot) => {
                 const user = snapshot.val().user;
                 if (user) {
                     return cb(null, user);
@@ -38,7 +39,7 @@ class AuthService {
     }
 
     login(user, cb) {
-        DBService.getDB().ref(user.user).set({
+        DBService.getDB().ref(usersTable + user.user).set({
             user
         }).then(() => {
             AsyncStorage.multiSet([
@@ -58,7 +59,7 @@ class AuthService {
     }
 
     logout(username, cb) {
-        DBService.getDB().ref(username).set(null).then(() => {
+        DBService.getDB().ref(usersTable + username).set(null).then(() => {
             AsyncStorage.multiRemove([
                 userKey
             ], (err) => {
