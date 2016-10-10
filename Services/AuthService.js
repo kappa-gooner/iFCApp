@@ -29,7 +29,7 @@ class AuthService {
 
     login(user, cb) {
         AsyncStorage.multiSet([
-            [userKey, JSON.stringify(user)] /*UserInfo*/
+            [userKey, JSON.stringify(user)]
         ], (err) => {
             if (err) {
                 throw err;

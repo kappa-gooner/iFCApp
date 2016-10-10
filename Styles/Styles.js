@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
         flex: 1,
+        justifyContent: 'flex-start'
     },
     logo: {
         width: 66,

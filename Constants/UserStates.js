@@ -4,7 +4,8 @@ const UserStates = KeyMirror({
     AWAY: null,
     IN_RANGE: null,
     SEATED: null,
-    ORDERED_EATING: null,
+    ORDERED: null,
+    EATING: null,
     EATING_DONE: null,
 });
 

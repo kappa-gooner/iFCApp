@@ -67,6 +67,11 @@ class BeaconsManager {
         });
         return nearestBeacon;
     }
+
+    static isLocatorBeacon(identifier) {
+        // Return if the beacon ranging is indeed a 'locator' beacon
+        return (identifier === MyBeacons.MrBeetroot.identifier);
+    }
 }
 
 export { BeaconsManager, MyBeacons };
