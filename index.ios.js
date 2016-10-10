@@ -18,6 +18,7 @@ import VendorView from './Views/VendorView';
 import CleanerView from './Views/CleanerView';
 
 import AuthService from './Services/AuthService';
+import DBService from './Services/DBService';
 
 import baseStyles from './Styles/Styles';
 
@@ -49,6 +50,7 @@ class iFCApp extends Component {
     }
 
     componentDidMount() {
+        DBService.initialize();
         AuthService.getUserInfo((err, userInfo) => {
             this.setState({
                 checkingAuth: false,

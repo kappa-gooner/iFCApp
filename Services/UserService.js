@@ -3,6 +3,7 @@ import {
 } from 'react-native';
 
 import UserStates from '../Constants/UserStates';
+import DBService from './DBService';
 
 const userKey = 'user';
 
@@ -23,8 +24,14 @@ class UserService {
             const userData = userInfo;
             userData.state = newstate;
 
-            AsyncStorage.setItem(userKey, JSON.stringify(userData));
-            console.log('Table updated successfully!');
+            DBService.getDB().ref(userData.user).set({
+                user: userData,
+            }).then(() => {
+                AsyncStorage.setItem(userKey, JSON.stringify(userData));
+                console.log('Table updated successfully!');
+            }).catch((err) => {
+                // Handle errors here
+            });
         } catch (error) {
               // Error saving data
         }

@@ -3,6 +3,7 @@ import {
 } from 'react-native';
 
 import _ from 'lodash';
+import DBService from './DBService';
 
 const userKey = 'user';
 
@@ -21,38 +22,58 @@ class AuthService {
             if (!result[userKey]) {
                 return cb();
             }
-
             const userInfo = JSON.parse(result[userKey]);
-            return cb(null, userInfo);
+
+            DBService.getDB().ref(userInfo.user).once('value').then((snapshot) => {
+                const user = snapshot.val().user;
+                if (user) {
+                    return cb(null, user);
+                }
+                return cb();
+            })
+            .catch((err) => {
+                return cb();
+            });
         });
     }
 
     login(user, cb) {
-        AsyncStorage.multiSet([
-            [userKey, JSON.stringify(user)]
-        ], (err) => {
-            if (err) {
-                throw err;
-            }
-            return cb({ success: true });
-        })
-        .catch((err) => {
+        DBService.getDB().ref(user.user).set({
+            user
+        }).then(() => {
+            AsyncStorage.multiSet([
+              [userKey, JSON.stringify(user)]
+            ], (err) => {
+                if (err) {
+                    throw err;
+                }
+                return cb({ success: true });
+            })
+            .catch((err) => {
+                return cb(err);
+            });
+        }).catch((err) => {
             return cb(err);
         });
     }
 
-    logout(cb) {
-      AsyncStorage.multiRemove([
-          userKey
-      ], (err) => {
-          if (err) {
-              throw err;
-          }
-          return cb({ success: true });
-      })
-      .catch((err) => {
-          return cb(err);
-      });
+    logout(username, cb) {
+        DBService.getDB().ref(username).set(null).then(() => {
+            AsyncStorage.multiRemove([
+                userKey
+            ], (err) => {
+                if (err) {
+                    throw err;
+                }
+                return cb({ success: true });
+            })
+            .catch((err) => {
+                return cb(err);
+            });
+        })
+        .catch((err) => {
+            return cb(err);
+        });
     }
 }
 

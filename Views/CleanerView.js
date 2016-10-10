@@ -10,7 +10,7 @@ import styles from '../Styles/Styles';
 
 class CleanerView extends Component {
     onLogoutPressed() {
-        require('../Services/AuthService').logout((results) => {
+        require('../Services/AuthService').logout(this.props.userInfo.user, (results) => {
             if (results.success && this.props.onLogout) {
                 this.props.onLogout();
             } });
