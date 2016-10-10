@@ -34,6 +34,9 @@ local.properties
 node_modules/
 npm-debug.log
 
+# Config files
+Config/
+
 # BUCK
 buck-out/
 \.buckd/
