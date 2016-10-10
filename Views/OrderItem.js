@@ -6,6 +6,9 @@ import {
     TouchableHighlight,
     StyleSheet,
 } from 'react-native';
+import _ from 'lodash';
+
+import Menu from '../Constants/MenuConstants';
 
 const styles = StyleSheet.create({
     container: {
@@ -51,21 +54,25 @@ class OrderItem extends Component {
     }
 
     render() {
+        const menuItem = _.sample(Menu);
+        const welcomeText = this.props.isVendor ? 'Customer orders' : 'Order Now!';
+        const orderText = this.props.isVendor ? 'Ready to eat!' : 'Order';
+
         return (
             <View style={styles.container}>
-                <Text style={styles.label}>Order Now!</Text>
+                <Text style={styles.label}>{welcomeText}</Text>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>Large bowl Teriyaki Chicken</Text>
+                    <Text style={styles.liText}>{menuItem.main}</Text>
                 </View>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>Japanese Croqutte</Text>
+                    <Text style={styles.liText}>{menuItem.side}</Text>
                 </View>
                 <View style={styles.li}>
                     <TouchableHighlight
                         onPress={this.onDonePressed.bind(this)}
                         style={styles.doneButton}
                     >
-                        <Text style={{ textAlign: 'center' }}>Order</Text>
+                        <Text style={{ textAlign: 'center' }}>{orderText}</Text>
                     </TouchableHighlight>
                 </View>
             </View>
@@ -76,6 +83,7 @@ class OrderItem extends Component {
 OrderItem.propTypes = {
     onDone: React.PropTypes.func.isRequired,
     userState: React.PropTypes.string.isRequired,
+    isVendor: React.PropTypes.bool.isRequired,
 };
 
 export default OrderItem;

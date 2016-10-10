@@ -19,8 +19,7 @@ class CustomerView extends Component {
     constructor(props) {
         super(props);
 
-        let localState = {
-            isBeaconRange: false,
+        const localState = {
             beaconRegion: '',
             beaconProximity: 'unknown',
         };
@@ -60,7 +59,6 @@ class CustomerView extends Component {
     enteredRegion(data) {
         if (data) {
             this.setState({
-                isBeaconRange: true,
                 beaconRegion: data.region.identifier,
             });
 
@@ -76,7 +74,6 @@ class CustomerView extends Component {
     exitedRegion(data) {
         if (data) {
             this.setState({
-                isBeaconRange: false,
                 beaconRegion: '',
             });
         }
@@ -143,18 +140,19 @@ class CustomerView extends Component {
         let initialDisplay = <Text/>;
         let orderDisplay = <Text/>;
 
-        if (this.state.isBeaconRange) {
+        if (this.state.userInfo.state !== UserStates.AWAY) {
             welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
                 this beacon is currently {this.state.beaconProximity}m away!</Text>;
             initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
                 userState={this.state.userInfo.state}
-                                />);
+                              />);
         }
 
         if (this.state.userInfo.state === UserStates.SEATED) {
-            orderDisplay = <OrderItem onDone={this.onDone.bind(this)}
+            orderDisplay = (<OrderItem isVendor={false}
+                onDone={this.onDone.bind(this)}
                 userState={this.state.userInfo.state}
-                           />;
+                            />);
         }
 
         return (
