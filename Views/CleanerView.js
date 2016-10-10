@@ -19,7 +19,7 @@ class CleanerView extends Component {
     render() {
         return (
           <View style={styles.container}>
-              <Text style={styles.heading}>Hello {this.props.name}</Text>
+              <Text style={styles.heading}>Hello {this.props.userInfo.user}</Text>
               <Text style={styles.info}>Here are the tables that need to be cleaned:</Text>
               <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
                   style={styles.logoutButton}
@@ -33,7 +33,12 @@ class CleanerView extends Component {
 
 CleanerView.propTypes = {
     onLogout: React.PropTypes.func.isRequired,
-    name: React.PropTypes.string.isRequired,
+    userInfo: React.PropTypes.shape({
+        user: React.PropTypes.string,
+        userType: React.PropTypes.string,
+        state: React.PropTypes.string,
+        table: React.PropTypes.number,
+    }).isRequired,
 };
 
 module.exports = CleanerView;

@@ -41,8 +41,7 @@ class iFCApp extends Component {
         this.state = {
             isLoggedIn: false,
             checkingAuth: true,
-            user: '',
-            userType: ''
+            userInfo: null,
         };
 
         this.onLogin = this.onLogin.bind(this);
@@ -57,10 +56,7 @@ class iFCApp extends Component {
             });
 
             if (this.state.isLoggedIn) {
-                this.setLoginState({
-                    user: userInfo.user,
-                    userType: userInfo.userType,
-                });
+                this.setLoginState(userInfo);
             }
         });
     }
@@ -72,8 +68,7 @@ class iFCApp extends Component {
     setLoginState(userInfo) {
         this.setState({
             isLoggedIn: true,
-            user: userInfo.user,
-            userType: userInfo.userType,
+            userInfo,
         });
     }
 
@@ -94,23 +89,23 @@ class iFCApp extends Component {
             );
         }
 
-        if (this.state.isLoggedIn) {
-            switch (this.state.userType) {
+        if (this.state.isLoggedIn && this.state.userInfo != null) {
+            switch (this.state.userInfo.userType) {
                 case 'customer':
                   return (
-                    <CustomerView name={this.state.user}
+                    <CustomerView userInfo={this.state.userInfo}
                         onLogout={this.onLogout}
                     />
                   );
                 case 'vendor':
                   return (
-                    <VendorView name={this.state.user}
+                    <VendorView userInfo={this.state.userInfo}
                         onLogout={this.onLogout}
                     />
                   );
                 case 'cleaner':
                   return (
-                    <CleanerView name={this.state.user}
+                    <CleanerView userInfo={this.state.userInfo}
                         onLogout={this.onLogout}
                     />
                   );

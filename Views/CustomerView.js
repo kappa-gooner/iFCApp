@@ -28,6 +28,10 @@ class CustomerView extends Component {
         });
     }
 
+    componentWillUnmount() {
+        this.customerViewListener.remove();
+    }
+
     enteredRegion(data) {
         console.log('Entered region: ' + data.region);
         if (data) {
@@ -65,7 +69,6 @@ class CustomerView extends Component {
     }
 
     onLogoutPressed() {
-        this.customerViewListener.remove();
         require('../Services/AuthService').logout((results) => {
             if (results.success && this.props.onLogout) {
                 this.props.onLogout();
@@ -76,7 +79,7 @@ class CustomerView extends Component {
         if (this.state.isBeaconRange) {
             return (
                 <View style={styles.container}>
-                <Text style={styles.heading}>Welcome to iFoodCourt {this.props.name}</Text>
+                <Text style={styles.heading}>Welcome to iFoodCourt {this.props.userInfo.user}</Text>
                 <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
                     this beacon is currently {this.state.beaconProximity}m away!</Text>
                 <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
@@ -88,7 +91,8 @@ class CustomerView extends Component {
         } else {
             return (
               <View style={styles.container}>
-                  <Text style={styles.heading}>Welcome to iFoodCourt {this.props.name}</Text>
+                  <Text style={styles.heading}>Welcome to iFoodCourt {this.props.userInfo.user}
+                  </Text>
                   <Text style={styles.info}>However, you're not in the
                         proximity of our foodcourt!</Text>
                   <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
@@ -104,7 +108,12 @@ class CustomerView extends Component {
 
 CustomerView.propTypes = {
     onLogout: React.PropTypes.func.isRequired,
-    name: React.PropTypes.string.isRequired,
+    userInfo: React.PropTypes.shape({
+        user: React.PropTypes.string,
+        userType: React.PropTypes.string,
+        state: React.PropTypes.string,
+        table: React.PropTypes.number,
+    }).isRequired,
 };
 
 module.exports = CustomerView;

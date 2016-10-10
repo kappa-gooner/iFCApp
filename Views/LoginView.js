@@ -12,6 +12,7 @@ import {
 
 import styles from '../Styles/Styles';
 import User from '../Models/User';
+import AuthService from '../Services/AuthService';
 
 const Item = Picker.Item;
 
@@ -48,9 +49,8 @@ class LoginView extends Component {
                 }, results));
 
                 if (results.success && this.props.onLogin) {
-                    this.props.onLogin({
-                        user: this.state.username,
-                        userType: this.state.customer
+                    AuthService.getUserInfo((err, userInfo) => {
+                        this.props.onLogin(userInfo);
                     });
                 }
             });
