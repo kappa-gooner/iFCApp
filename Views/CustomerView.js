@@ -5,10 +5,12 @@ import {
     Text,
     TouchableHighlight,
     DeviceEventEmitter,
+    ScrollView,
 } from 'react-native';
 
 import styles from '../Styles/Styles';
 import ItemRow from './ItemRow';
+import OrderItem from './OrderItem';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import { BeaconsManager } from '../Services/BeaconsManager';
@@ -49,7 +51,9 @@ class CustomerView extends Component {
     }
 
     componentWillUnmount() {
-        this.customerViewListener.remove();
+        if (this.customerViewListener) {
+            this.customerViewListener.remove();
+        }
         this.storeSubscription();
     }
 
@@ -59,10 +63,13 @@ class CustomerView extends Component {
                 isBeaconRange: true,
                 beaconRegion: data.region.identifier,
             });
-            userService.dispatch({
-                type: UserStates.IN_RANGE,
-                user: this.state.userInfo,
-            });
+
+            if (this.state.userInfo.state !== UserStates.IN_RANGE) {
+                userService.dispatch({
+                    type: UserStates.IN_RANGE,
+                    user: this.state.userInfo,
+                });
+            }
         }
     }
 
@@ -78,7 +85,8 @@ class CustomerView extends Component {
     beaconsInRange(beaconData) {
         if (beaconData) {
             if (beaconData.beacons && beaconData.beacons.length > 0) {
-                if (this.state.userInfo.state === UserStates.AWAY) {
+                if (this.state.userInfo.state === UserStates.AWAY
+                    || this.state.userInfo.state === UserStates.IN_RANGE) {
                     if (BeaconsManager.isLocatorBeacon(beaconData.region.identifier)) {
                         this.enteredRegion(beaconData);
                         this.setState({
@@ -132,26 +140,38 @@ class CustomerView extends Component {
     render() {
         let welcomeMsg = <Text style={styles.info}>However, you're not in the
               proximity of our foodcourt!</Text>;
-        let userStateDisplay = <Text/>;
+        let initialDisplay = <Text/>;
+        let orderDisplay = <Text/>;
 
         if (this.state.isBeaconRange) {
             welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
                 this beacon is currently {this.state.beaconProximity}m away!</Text>;
-            userStateDisplay = (<ItemRow onDone={this.onDone.bind(this)}
+            initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
                 userState={this.state.userInfo.state}
                                 />);
         }
-        
+
+        if (this.state.userInfo.state === UserStates.SEATED) {
+            orderDisplay = <OrderItem onDone={this.onDone.bind(this)}
+                userState={this.state.userInfo.state}
+                           />;
+        }
+
         return (
             <View style={styles.container}>
-            <Text style={styles.heading}>Welcome to iFoodCourt {this.state.userInfo.user}</Text>
-            {welcomeMsg}
-            {userStateDisplay}
-            <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
-                style={styles.logoutButton}
-            >
-                <Text style={styles.buttonText}>Log out</Text>
-            </TouchableHighlight>
+            <ScrollView
+              scrollEventThrottle={200}
+             >
+             <Text style={styles.heading}>Welcome to iFoodCourt {this.state.userInfo.user}</Text>
+             {welcomeMsg}
+             {initialDisplay}
+             {orderDisplay}
+             <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
+                 style={styles.logoutButton}
+             >
+                 <Text style={styles.buttonText}>Log out</Text>
+             </TouchableHighlight>
+          </ScrollView>
         </View>);
     }
 }
