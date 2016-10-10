@@ -1,45 +1,56 @@
+import { createStore } from 'redux';
 import {
     AsyncStorage,
 } from 'react-native';
 
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
+import User from '../Models/User';
 
 const userKey = 'user';
 const usersTable = 'Users/';
 
-class UserService {
-    static handleUserAction(action) {
-        switch (action.Type) {
-        case UserStates.IN_RANGE:
-            this.updateUserTable(action.Payload, action.Type);
-            break;
-        case UserStates.SEATED:
-            this.updateUserTable(action.Payload, action.Type);
-            break;
-        default:
-                // Do nothing
-        }
-    }
+const defaultState = {
+    user: 'username',
+    userType: 'usertype',
+    state: UserStates.AWAY,
+    table: -1,
+};
 
-    static updateUserTable(userInfo, newstate) {
-        try {
-            // Update user info here
-            const userData = userInfo;
-            userData.state = newstate;
+function updateUserTable(userInfo, newstate) {
+    try {
+        // Update user info here
+        const userData = userInfo;
+        userData.state = newstate;
 
-            DBService.getDB().ref(usersTable + userData.user).set({
-                user: userData,
-            }).then(() => {
-                AsyncStorage.setItem(userKey, JSON.stringify(userData));
-                console.log('Table updated successfully!');
-            }).catch((err) => {
-                // Handle errors here
-            });
-        } catch (error) {
-              // Error saving data
-        }
+        DBService.getDB().ref(usersTable + userData.user).set({
+            user: userData,
+        }).then(() => {
+            AsyncStorage.setItem(userKey, JSON.stringify(userData));
+            console.log('Table updated successfully!');
+        }).catch((err) => {
+            // Handle errors here
+        });
+    } catch (error) {
+          // Error saving data
     }
 }
 
-export { UserService as default }
+function userService(state = defaultState, action) {
+    switch (action.type) {
+    case UserStates.IN_RANGE:
+    case UserStates.SEATED: {
+        const userInfo = action.user;
+        updateUserTable(userInfo, action.type);
+        return Object.assign({}, state, new User(
+            userInfo.user,
+            userInfo.userType,
+            action.type,
+            userInfo.table,
+        ));
+    }
+    default:
+        return Object.assign({}, state, action.user);
+    }
+}
+export default createStore(userService);

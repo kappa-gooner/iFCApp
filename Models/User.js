@@ -1,11 +1,11 @@
 import UserStates from '../Constants/UserStates';
 
 class User {
-    constructor(username, usertype) {
+    constructor(username, usertype, state = UserStates.AWAY, table = -1) {
         this.user = username;
         this.userType = usertype;
-        this.state = UserStates.AWAY;
-        this.table = -1;
+        this.state = state;
+        this.table = table;
     }
 }
 

@@ -10,18 +10,30 @@ import {
 import styles from '../Styles/Styles';
 import ItemRow from './ItemRow';
 import UserStates from '../Constants/UserStates';
-import UserService from '../Services/UserService';
+import userService from '../Services/UserService';
 import { BeaconsManager } from '../Services/BeaconsManager';
 
 class CustomerView extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
+        let localState = {
             isBeaconRange: false,
             beaconRegion: '',
             beaconProximity: 'unknown',
         };
+
+        // Assign base state
+        this.state = Object.assign({}, localState, {
+            userInfo: userService.getState(),
+        });
+
+        // Subscribe to changes in the userService
+        this.storeSubscription = userService.subscribe(() => {
+            this.setState({ // eslint-disable-line react/no-set-state
+                userInfo: userService.getState(),
+            });
+        });
     }
 
     componentDidMount() {
@@ -29,10 +41,16 @@ class CustomerView extends Component {
         this.customerViewListener = DeviceEventEmitter.addListener('beaconsDidRange', (data) => {
             this.beaconsInRange(data);
         });
+
+        userService.dispatch({
+            type: '',
+            user: this.props.userInfo,
+        });
     }
 
     componentWillUnmount() {
         this.customerViewListener.remove();
+        this.storeSubscription();
     }
 
     enteredRegion(data) {
@@ -41,9 +59,9 @@ class CustomerView extends Component {
                 isBeaconRange: true,
                 beaconRegion: data.region.identifier,
             });
-            UserService.handleUserAction({
-                Type: UserStates.IN_RANGE,
-                Payload: this.props.userInfo,
+            userService.dispatch({
+                type: UserStates.IN_RANGE,
+                user: this.state.userInfo,
             });
         }
     }
@@ -60,7 +78,7 @@ class CustomerView extends Component {
     beaconsInRange(beaconData) {
         if (beaconData) {
             if (beaconData.beacons && beaconData.beacons.length > 0) {
-                if (this.props.userInfo.state === UserStates.AWAY) {
+                if (this.state.userInfo.state === UserStates.AWAY) {
                     if (BeaconsManager.isLocatorBeacon(beaconData.region.identifier)) {
                         this.enteredRegion(beaconData);
                         this.setState({
@@ -74,7 +92,7 @@ class CustomerView extends Component {
     }
 
     onLogoutPressed() {
-        require('../Services/AuthService').logout(this.props.userInfo.user, (results) => {
+        require('../Services/AuthService').logout(this.state.userInfo.user, (results) => {
             if (results.success && this.props.onLogout) {
                 this.props.onLogout();
             } });
@@ -86,12 +104,12 @@ class CustomerView extends Component {
             BeaconsManager.findEmptyTable()
                     .then((freeTable) => {
                         if (freeTable) {
-                            const userInfo = this.props.userInfo;
+                            const userInfo = this.state.userInfo;
                             userInfo.table = freeTable.table;
 
-                            UserService.handleUserAction({
-                                Type: UserStates.SEATED,
-                                Payload: userInfo,
+                            userService.dispatch({
+                                type: UserStates.SEATED,
+                                user: userInfo,
                             });
                         }
                         else {
@@ -120,13 +138,13 @@ class CustomerView extends Component {
             welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
                 this beacon is currently {this.state.beaconProximity}m away!</Text>;
             userStateDisplay = (<ItemRow onDone={this.onDone.bind(this)}
-                userState={this.props.userInfo.state}
+                userState={this.state.userInfo.state}
                                 />);
         }
-        console.log('Users current state: ' + this.props.userInfo.state);
+        
         return (
             <View style={styles.container}>
-            <Text style={styles.heading}>Welcome to iFoodCourt {this.props.userInfo.user}</Text>
+            <Text style={styles.heading}>Welcome to iFoodCourt {this.state.userInfo.user}</Text>
             {welcomeMsg}
             {userStateDisplay}
             <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
