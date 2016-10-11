@@ -33,7 +33,7 @@ class VendorView extends Component {
 
         // Assign base state
         this.state = Object.assign({}, {
-            dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
+            dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => {} }),
         });
     }
 
