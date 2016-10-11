@@ -58,9 +58,19 @@ class OrderItem extends Component {
     }
 
     componentWillMount() {
-        this.setState({
-            order: _.sample(Menu),
-        });
+        if (!this.props.orderItem) {
+            this.setState({
+                order: {
+                    order: _.sample(Menu),
+                    table: -1,
+                    user: '',
+                },
+            });
+        } else {
+            this.setState({
+                order: this.props.orderItem,
+            });
+        }
     }
 
     onDonePressed() {
@@ -75,10 +85,10 @@ class OrderItem extends Component {
             <View style={styles.container}>
                 <Text style={styles.label}>{welcomeText}</Text>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>{this.state.order.main}</Text>
+                    <Text style={styles.liText}>{this.state.order.order.main}</Text>
                 </View>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>{this.state.order.side}</Text>
+                    <Text style={styles.liText}>{this.state.order.order.side}</Text>
                 </View>
                 <View style={styles.li}>
                     <TouchableHighlight
@@ -97,6 +107,9 @@ OrderItem.propTypes = {
     onDone: React.PropTypes.func.isRequired,
     userState: React.PropTypes.string.isRequired,
     isVendor: React.PropTypes.bool.isRequired,
+    orderItem: React.PropTypes.shape({
+
+    }),
 };
 
 export default OrderItem;

@@ -71,6 +71,9 @@ const styles = StyleSheet.create({
     loader: {
         marginTop: 20,
     },
+    listView: {
+        flex: 1,
+    },
 });
 
 export { styles as default };

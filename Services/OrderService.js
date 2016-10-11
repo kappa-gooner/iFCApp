@@ -44,8 +44,19 @@ function orderService(state = defaultState, action) {
             orderInfo.user,
         ));
     }
+    case UserStates.ORDER_READY: {
+        const table = action.order.table;
+        DBService.getDB().ref(ordersTable + table).set(null).then(() => {
+            console.log('Order Table updated successfully!');
+        })
+        .catch((err) => {
+            // Handle errors here
+        });
+        // Irrelevant
+        return Object.assign({}, state, action.order);
+    }
     default:
-        return Object.assign({}, state, action.user);
+        return Object.assign({}, state, action.order);
     }
 }
 

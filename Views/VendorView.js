@@ -5,12 +5,28 @@ import {
     Text,
     TouchableHighlight,
     ScrollView,
+    ListView,
 } from 'react-native';
+import _ from 'lodash';
 
 import styles from '../Styles/Styles';
 import OrderItem from './OrderItem';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
+import orderService from '../Services/OrderService';
+import DBService from '../Services/DBService';
+import Menu from '../Constants/MenuConstants';
+import Order from '../Models/Order';
+import User from '../Models/User';
+
+const ordersTable = 'Orders';
+const sampleMenu = {
+    order: _.sample(Menu),
+    table: -1,
+    user: '',
+};
+let ordersRef;
+
 
 class VendorView extends Component {
     constructor(props) {
@@ -18,6 +34,8 @@ class VendorView extends Component {
 
         // Assign base state
         this.state = Object.assign({}, {
+            dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
+            orderInfo: orderService.getState(),
             userInfo: userService.getState(),
         });
 
@@ -29,15 +47,39 @@ class VendorView extends Component {
         });
     }
 
-    componentDidMount() {
+    componentWillMount() {
         userService.dispatch({
             type: '',
             user: this.props.userInfo,
+        });
+
+        ordersRef = DBService.getDB().ref(ordersTable);
+
+        ordersRef.on('value', (snap) => {
+            this.ordersTableUpdated(snap.val());
+        });
+
+        this.setState({ // eslint-disable-line react/no-set-state
+            dataSource: this.state.dataSource.cloneWithRows([sampleMenu]),
         });
     }
 
     componentWillUnmount() {
         this.storeSubscription();
+        ordersRef.off();
+    }
+
+    ordersTableUpdated(update) {
+        const orders = [sampleMenu];
+        if (update && update.length > 0) {
+            update.forEach((child) => {
+                orders.push(child.order);
+            });
+        }
+
+        this.setState({ // eslint-disable-line react/no-set-state
+            dataSource: this.state.dataSource.cloneWithRows(orders),
+        });
     }
 
     onLogoutPressed() {
@@ -47,15 +89,27 @@ class VendorView extends Component {
             } });
     }
 
-    onDone(orderState) {
-        console.log(orderState);
-        switch (orderState) {
-        case UserStates.ORDER_PENDING: {
-            // Update Order DB to ORDER_READY (Delete entry from DB)
-            // Update user status to 'EATING'
-        }
-        default:
-            // Do nothing
+    onDone(userState, order = null) {
+        console.log(userState);
+        if (order !== null) {
+            const orderState = order.state;
+            switch (orderState) {
+            case UserStates.ORDER_PENDING: {
+                // Update Order DB to ORDER_READY (Delete entry from DB)
+                orderService.dispatch({
+                    type: UserStates.ORDER_READY,
+                    order: new Order(order.order, orderState, order.table, order.user),
+                });
+                // Update user status to 'EATING'
+                userService.dispatch({
+                    type: UserStates.EATING,
+                    user: new User(order.user, 'customer', UserStates.ORDERED, order.table),
+                });
+                break;
+            }
+            default:
+                // Do nothing
+            }
         }
     }
 
@@ -67,9 +121,11 @@ class VendorView extends Component {
           >
               <Text style={styles.heading}>Hello {this.props.userInfo.user}</Text>
               <Text style={styles.info}>Here are the orders that have been placed:</Text>
-              <OrderItem isVendor={true} onDone={this.onDone.bind(this)}
-                  userState={this.state.userInfo.state}
-              />
+              <ListView
+                  dataSource={this.state.dataSource}
+                  enableEmptySections={true}
+                  renderRow={this._renderItem.bind(this)}
+                  style={styles.listview}/>
               <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
                   style={styles.logoutButton}
               >
@@ -77,6 +133,15 @@ class VendorView extends Component {
               </TouchableHighlight>
           </ScrollView>
           </View>
+        );
+    }
+
+    _renderItem(item) {
+        return (
+            <OrderItem isVendor={true} onDone={this.onDone.bind(this)}
+                orderItem={item}
+                userState={this.state.userInfo.state}
+            />
         );
     }
 }

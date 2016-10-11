@@ -10,6 +10,7 @@ const UserStates = KeyMirror({
 
     // Vendor specific
     ORDER_PENDING: null,
+    ORDER_READY: null,
 });
 
 export { UserStates as default };
