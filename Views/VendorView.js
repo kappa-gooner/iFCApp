@@ -27,7 +27,6 @@ const sampleMenu = {
 };
 let ordersRef;
 
-
 class VendorView extends Component {
     constructor(props) {
         super(props);
@@ -35,24 +34,10 @@ class VendorView extends Component {
         // Assign base state
         this.state = Object.assign({}, {
             dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
-            orderInfo: orderService.getState(),
-            userInfo: userService.getState(),
-        });
-
-        // Subscribe to changes in the userService
-        this.storeSubscription = userService.subscribe(() => {
-            this.setState({ // eslint-disable-line react/no-set-state
-                userInfo: userService.getState(),
-            });
         });
     }
 
     componentWillMount() {
-        userService.dispatch({
-            type: '',
-            user: this.props.userInfo,
-        });
-
         ordersRef = DBService.getDB().ref(ordersTable);
 
         ordersRef.on('value', (snap) => {
@@ -65,7 +50,6 @@ class VendorView extends Component {
     }
 
     componentWillUnmount() {
-        this.storeSubscription();
         ordersRef.off();
     }
 
@@ -83,7 +67,7 @@ class VendorView extends Component {
     }
 
     onLogoutPressed() {
-        require('../Services/AuthService').logout(this.state.userInfo.user, (results) => {
+        require('../Services/AuthService').logout(this.props.userInfo.user, (results) => {
             if (results.success && this.props.onLogout) {
                 this.props.onLogout();
             } });
@@ -140,7 +124,7 @@ class VendorView extends Component {
         return (
             <OrderItem isVendor={true} onDone={this.onDone.bind(this)}
                 orderItem={item}
-                userState={this.state.userInfo.state}
+                userState={this.props.userInfo.state}
             />
         );
     }

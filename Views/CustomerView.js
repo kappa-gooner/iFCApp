@@ -14,8 +14,12 @@ import OrderItem from './OrderItem';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
+import DBService from '../Services/DBService';
 import Order from '../Models/Order';
 import { BeaconsManager } from '../Services/BeaconsManager';
+
+let usersRef;
+const usersTable = 'Users/';
 
 class CustomerView extends Component {
     constructor(props) {
@@ -30,13 +34,6 @@ class CustomerView extends Component {
         this.state = Object.assign({}, localState, {
             userInfo: userService.getState(),
         });
-
-        // Subscribe to changes in the userService
-        this.storeSubscription = userService.subscribe(() => {
-            this.setState({ // eslint-disable-line react/no-set-state
-                userInfo: userService.getState(),
-            });
-        });
     }
 
     componentDidMount() {
@@ -49,13 +46,19 @@ class CustomerView extends Component {
             type: '',
             user: this.props.userInfo,
         });
+
+        usersRef = DBService.getDB().ref(usersTable + this.props.userInfo.user);
+
+        usersRef.on('value', (snap) => {
+            this.usersTableUpdated(snap.val());
+        });
     }
 
     componentWillUnmount() {
         if (this.customerViewListener) {
             this.customerViewListener.remove();
         }
-        this.storeSubscription();
+        usersRef.off();
     }
 
     enteredRegion(data) {
@@ -131,7 +134,7 @@ class CustomerView extends Component {
             // Update 'Orders table'
             orderService.dispatch({
                 type: UserStates.ORDER_PENDING,
-                order: new Order(order, userState, userInfo.table, userInfo.user),
+                order: new Order(order.order, userState, userInfo.table, userInfo.user),
             });
             // Set user state to Ordered
             userService.dispatch({
@@ -142,6 +145,14 @@ class CustomerView extends Component {
         }
         default:
             // Do nothing
+        }
+    }
+
+    usersTableUpdated(update) {
+        if (update) {
+            this.setState({ // eslint-disable-line react/no-set-state
+                userInfo: update.user,
+            });
         }
     }
 
