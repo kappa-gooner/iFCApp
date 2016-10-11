@@ -16,10 +16,10 @@ import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
 import Menu from '../Constants/MenuConstants';
+import DB from '../Constants/DBConstants';
 import Order from '../Models/Order';
 import User from '../Models/User';
 
-const ordersTable = 'Orders';
 const sampleMenu = {
     order: _.sample(Menu),
     table: -1,
@@ -38,7 +38,7 @@ class VendorView extends Component {
     }
 
     componentWillMount() {
-        ordersRef = DBService.getDB().ref(ordersTable);
+        ordersRef = DBService.getDB().ref(DB.ordersTable);
 
         ordersRef.on('value', (snap) => {
             this.ordersTableUpdated(snap.val());

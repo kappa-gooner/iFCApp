@@ -6,9 +6,7 @@ import {
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 import User from '../Models/User';
-
-const userKey = 'user';
-const usersTable = 'Users/';
+import DB from '../Constants/DBConstants';
 
 const defaultState = {
     user: 'username',
@@ -23,10 +21,10 @@ function updateUserTable(userInfo, newstate) {
         const userData = userInfo;
         userData.state = newstate;
 
-        DBService.getDB().ref(usersTable + userData.user).set({
+        DBService.getDB().ref(DB.usersTable + userData.user).set({
             user: userData,
         }).then(() => {
-            AsyncStorage.setItem(userKey, JSON.stringify(userData));
+            AsyncStorage.setItem(DB.userKey, JSON.stringify(userData));
             console.log('Table updated successfully!');
         }).catch((err) => {
             // Handle errors here

@@ -4,13 +4,11 @@ import {
 
 import _ from 'lodash';
 import DBService from './DBService';
-
-const userKey = 'user';
-const usersTable = 'Users/';
+import DB from '../Constants/DBConstants';
 
 class AuthService {
     getUserInfo(cb) {
-        AsyncStorage.multiGet([userKey], (err, val) => {
+        AsyncStorage.multiGet([DB.userKey], (err, val) => {
             if (err) {
                 return cb(err);
             }
@@ -20,12 +18,12 @@ class AuthService {
             }
             const result = _.fromPairs(val);
 
-            if (!result[userKey]) {
+            if (!result[DB.userKey]) {
                 return cb();
             }
-            const userInfo = JSON.parse(result[userKey]);
+            const userInfo = JSON.parse(result[DB.userKey]);
 
-            DBService.getDB().ref(usersTable + userInfo.user).once('value').then((snapshot) => {
+            DBService.getDB().ref(DB.usersTable + userInfo.user).once('value').then((snapshot) => {
                 const user = snapshot.val().user;
                 if (user) {
                     return cb(null, user);
@@ -39,11 +37,11 @@ class AuthService {
     }
 
     login(user, cb) {
-        DBService.getDB().ref(usersTable + user.user).set({
+        DBService.getDB().ref(DB.usersTable + user.user).set({
             user
         }).then(() => {
             AsyncStorage.multiSet([
-              [userKey, JSON.stringify(user)]
+              [DB.userKey, JSON.stringify(user)]
             ], (err) => {
                 if (err) {
                     throw err;
@@ -59,18 +57,9 @@ class AuthService {
     }
 
     logout(username, cb) {
-        DBService.getDB().ref(usersTable + username).set(null).then(() => {
-            AsyncStorage.multiRemove([
-                userKey
-            ], (err) => {
-                if (err) {
-                    throw err;
-                }
-                return cb({ success: true });
-            })
-            .catch((err) => {
-                return cb(err);
-            });
+        DBService.getDB().ref(DB.usersTable + username).set(null).then(() => {
+            AsyncStorage.clear();
+            return cb({ success: true });
         })
         .catch((err) => {
             return cb(err);

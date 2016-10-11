@@ -3,8 +3,7 @@ import { createStore } from 'redux';
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 import Order from '../Models/Order';
-
-const ordersTable = 'Orders/';
+import DB from '../Constants/DBConstants';
 
 const defaultState = {
     order: {},
@@ -19,7 +18,7 @@ function updateOrderTable(orderInfo, newstate) {
         const orderData = orderInfo;
         orderData.state = newstate;
 
-        DBService.getDB().ref(ordersTable + orderData.table).set({
+        DBService.getDB().ref(DB.ordersTable + orderData.table).set({
             order: orderData,
         }).then(() => {
             console.log('Order Table updated successfully!');
@@ -46,7 +45,7 @@ function orderService(state = defaultState, action) {
     }
     case UserStates.ORDER_READY: {
         const table = action.order.table;
-        DBService.getDB().ref(ordersTable + table).set(null).then(() => {
+        DBService.getDB().ref(DB.ordersTable + table).set(null).then(() => {
             console.log('Order Table updated successfully!');
         })
         .catch((err) => {

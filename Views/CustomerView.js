@@ -17,9 +17,9 @@ import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
 import Order from '../Models/Order';
 import { BeaconsManager } from '../Services/BeaconsManager';
+import DB from '../Constants/DBConstants';
 
 let usersRef;
-const usersTable = 'Users/';
 
 class CustomerView extends Component {
     constructor(props) {
@@ -47,7 +47,7 @@ class CustomerView extends Component {
             user: this.props.userInfo,
         });
 
-        usersRef = DBService.getDB().ref(usersTable + this.props.userInfo.user);
+        usersRef = DBService.getDB().ref(DB.usersTable + this.props.userInfo.user);
 
         usersRef.on('value', (snap) => {
             this.usersTableUpdated(snap.val());
