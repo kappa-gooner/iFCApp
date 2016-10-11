@@ -1,7 +1,4 @@
 import { createStore } from 'redux';
-import {
-    AsyncStorage,
-} from 'react-native';
 
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
@@ -24,7 +21,6 @@ function updateUserTable(userInfo, newstate) {
         DBService.getDB().ref(DB.usersTable + userData.user).set({
             user: userData,
         }).then(() => {
-            AsyncStorage.setItem(DB.userKey, JSON.stringify(userData));
             console.log('Table updated successfully!');
         }).catch((err) => {
             // Handle errors here

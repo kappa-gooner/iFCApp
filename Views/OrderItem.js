@@ -78,7 +78,14 @@ class OrderItem extends Component {
     }
 
     render() {
-        const welcomeText = this.props.isVendor ? '' : 'Order Now!';
+        let tableInfo;
+        if (this.state.order && this.state.order.table < 0) {
+            tableInfo = 'Sample Order';
+        } else {
+            tableInfo = `Table #${this.state.order.table}`;
+        }
+
+        const welcomeText = this.props.isVendor ? tableInfo : 'Featured Menu!';
         const orderText = this.props.isVendor ? 'Ready to eat!' : 'Order';
 
         return (
