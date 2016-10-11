@@ -49,23 +49,36 @@ const styles = StyleSheet.create({
 });
 
 class OrderItem extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            order: {},
+        };
+    }
+
+    componentWillMount() {
+        this.setState({
+            order: _.sample(Menu),
+        });
+    }
+
     onDonePressed() {
-        this.props.onDone(this.props.userState);
+        this.props.onDone(this.props.userState, this.state.order);
     }
 
     render() {
-        const menuItem = _.sample(Menu);
-        const welcomeText = this.props.isVendor ? 'Customer orders' : 'Order Now!';
+        const welcomeText = this.props.isVendor ? '' : 'Order Now!';
         const orderText = this.props.isVendor ? 'Ready to eat!' : 'Order';
 
         return (
             <View style={styles.container}>
                 <Text style={styles.label}>{welcomeText}</Text>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>{menuItem.main}</Text>
+                    <Text style={styles.liText}>{this.state.order.main}</Text>
                 </View>
                 <View style={styles.li}>
-                    <Text style={styles.liText}>{menuItem.side}</Text>
+                    <Text style={styles.liText}>{this.state.order.side}</Text>
                 </View>
                 <View style={styles.li}>
                     <TouchableHighlight

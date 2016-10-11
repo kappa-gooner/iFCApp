@@ -13,6 +13,8 @@ import ItemRow from './ItemRow';
 import OrderItem from './OrderItem';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
+import orderService from '../Services/OrderService';
+import Order from '../Models/Order';
 import { BeaconsManager } from '../Services/BeaconsManager';
 
 class CustomerView extends Component {
@@ -103,13 +105,14 @@ class CustomerView extends Component {
             } });
     }
 
-    onDone(userState) {
+    onDone(userState, order = null) {
+        const userInfo = this.state.userInfo;
         switch (userState) {
         case UserStates.IN_RANGE: {
+            console.log('Finding table!!');
             BeaconsManager.findEmptyTable()
                     .then((freeTable) => {
                         if (freeTable) {
-                            const userInfo = this.state.userInfo;
                             userInfo.table = freeTable.table;
 
                             userService.dispatch({
@@ -123,12 +126,20 @@ class CustomerView extends Component {
                     });
             break;
         }
-        case UserStates.SEATED:
-            console.log('Need to handle: ' + UserStates.SEATED);
-            // 1) Simulate order
-            // 2) Push 'order to vendors'
-            // 3) Set state to 'ORDERED'
+        case UserStates.SEATED: {
+            console.log('Handling: ' + UserStates.SEATED);
+            // Update 'Orders table'
+            orderService.dispatch({
+                type: UserStates.ORDER_PENDING,
+                order: new Order(order, userState, userInfo.table, userInfo.user),
+            });
+            // Set user state to Ordered
+            userService.dispatch({
+                type: UserStates.ORDERED,
+                user: userInfo,
+            });
             break;
+        }
         default:
             // Do nothing
         }

@@ -39,7 +39,8 @@ function updateUserTable(userInfo, newstate) {
 function userService(state = defaultState, action) {
     switch (action.type) {
     case UserStates.IN_RANGE:
-    case UserStates.SEATED: {
+    case UserStates.SEATED:
+    case UserStates.ORDERED: {
         const userInfo = action.user;
         updateUserTable(userInfo, action.type);
         return Object.assign({}, state, new User(

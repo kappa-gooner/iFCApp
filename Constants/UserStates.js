@@ -7,6 +7,9 @@ const UserStates = KeyMirror({
     ORDERED: null,
     EATING: null,
     EATING_DONE: null,
+
+    // Vendor specific
+    ORDER_PENDING: null,
 });
 
 export { UserStates as default };
