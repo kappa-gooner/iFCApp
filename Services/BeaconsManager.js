@@ -3,6 +3,7 @@ import Beacons from 'react-native-ibeacon';
 
 import MyBeacons from '../Constants/BeaconsInfo';
 import DBService from './DBService';
+import { AppConstants } from '../Constants/Constants';
 
 const BeaconsTable = 'Beacons/';
 
@@ -63,13 +64,13 @@ class BeaconsManager {
             Object.keys(beacons).forEach((identifier) => {
                 const beacon = beacons[identifier];
 
-                if (beacon.type === 'RESERVE' && beacon.state === 'FREE') {
+                if (beacon.type === AppConstants.reserve && beacon.state === AppConstants.free) {
                     freeBeacon = beacon;
                 }
             });
 
             if (freeBeacon) {
-                this.updateBeaconTable(freeBeacon, 'OCCUPIED');
+                this.updateBeaconTable(freeBeacon, AppConstants.occupied);
             }
             return freeBeacon;
         })

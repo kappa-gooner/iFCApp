@@ -22,6 +22,8 @@ import DBService from './Services/DBService';
 
 import baseStyles from './Styles/Styles';
 
+import { AppConstants } from './Constants/Constants';
+
 const styles = Object.assign(baseStyles, {
     welcome: {
         fontSize: 20,
@@ -93,30 +95,30 @@ class iFCApp extends Component {
 
         if (this.state.isLoggedIn && this.state.userInfo != null) {
             switch (this.state.userInfo.userType) {
-                case 'customer':
-                  return (
-                    <CustomerView userInfo={this.state.userInfo}
-                        onLogout={this.onLogout}
-                    />
-                  );
-                case 'vendor':
-                  return (
-                    <VendorView userInfo={this.state.userInfo}
-                        onLogout={this.onLogout}
-                    />
-                  );
-                case 'cleaner':
-                  return (
-                    <CleanerView userInfo={this.state.userInfo}
-                        onLogout={this.onLogout}
-                    />
-                  );
-                default :
-                  return (
-                    <View style={styles.container}>
-                      <Text style={styles.welcome}>Logged in!</Text>
-                    </View>
-                  );
+            case AppConstants.customer:
+                return (
+                <CustomerView onLogout={this.onLogout}
+                    userInfo={this.state.userInfo}
+                />
+              );
+            case AppConstants.vendor:
+                return (
+                <VendorView onLogout={this.onLogout}
+                    userInfo={this.state.userInfo}
+                />
+              );
+            case AppConstants.cleaner:
+                return (
+                <CleanerView onLogout={this.onLogout}
+                    userInfo={this.state.userInfo}
+                />
+              );
+            default :
+                return (
+                <View style={styles.container}>
+                  <Text style={styles.welcome}>Logged in!</Text>
+                </View>
+              );
             }
         } else {
             return (

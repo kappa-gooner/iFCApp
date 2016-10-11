@@ -6,7 +6,7 @@ import {
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 import User from '../Models/User';
-import DB from '../Constants/DBConstants';
+import DB from '../Constants/Constants';
 
 const defaultState = {
     user: 'username',

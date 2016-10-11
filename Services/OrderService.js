@@ -3,7 +3,7 @@ import { createStore } from 'redux';
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 import Order from '../Models/Order';
-import DB from '../Constants/DBConstants';
+import DB from '../Constants/Constants';
 
 const defaultState = {
     order: {},

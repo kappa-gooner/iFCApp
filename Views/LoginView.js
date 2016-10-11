@@ -13,20 +13,16 @@ import {
 import styles from '../Styles/Styles';
 import User from '../Models/User';
 import AuthService from '../Services/AuthService';
+import { AppConstants } from '../Constants/Constants';
 
 const Item = Picker.Item;
 
 class LoginView extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            showProgress: false,
-
-            // user type states
-            customer: 'customer',
-            vendor: 'vendor',
-            cleaner: 'cleaner',
-        };
+        this.state = Object.assign({}, AppConstants, {
+            showProgress: false
+        });
     }
 
     onValueChange = (key: string, value: string) => {
@@ -74,13 +70,13 @@ class LoginView extends Component {
                   style={styles.picker}
               >
                       <Item label="Customer"
-                          value="customer"
+                          value={AppConstants.customer}
                       />
                       <Item label="Food stall Vendor"
-                          value="vendor"
+                          value={AppConstants.vendor}
                       />
                       <Item label="Cleaning Staff"
-                          value="cleaner"
+                          value={AppConstants.cleaner}
                       />
               </Picker>
               <TouchableHighlight onPress={this.onLoginPressed.bind(this)}
