@@ -3,7 +3,7 @@ import { createStore } from 'redux';
 import UserStates from '../Constants/UserStates';
 import DBService from './DBService';
 import User from '../Models/User';
-import DB from '../Constants/Constants';
+import { DB } from '../Constants/Constants';
 
 const defaultState = {
     user: 'username',

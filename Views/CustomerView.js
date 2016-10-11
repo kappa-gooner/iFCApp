@@ -16,9 +16,10 @@ import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
+import LocationService from '../Services/LocationService';
 import Order from '../Models/Order';
 import { BeaconsManager } from '../Services/BeaconsManager';
-import DB from '../Constants/Constants';
+import { DB, TableConstants } from '../Constants/Constants';
 
 let usersRef;
 
@@ -88,18 +89,34 @@ class CustomerView extends Component {
     beaconsInRange(beaconData) {
         if (beaconData) {
             if (beaconData.beacons && beaconData.beacons.length > 0) {
-                if (this.state.userInfo.state === UserStates.AWAY
-                    || this.state.userInfo.state === UserStates.IN_RANGE) {
+                const userstate = this.state.userInfo.state;
+                if (LocationService.isYetToOrder(userstate)) {
                     if (BeaconsManager.isLocatorBeacon(beaconData.region.identifier)) {
                         this.enteredRegion(beaconData);
-                        this.setState({
-                            beaconProximity: Math.trunc(BeaconsManager.getBeaconDistance(-74,
-                                    beaconData.beacons[0].rssi)),
-                        });
+                        this.updateDistanceString(beaconData.beacons[0].rssi);
+                    }
+                } else if (LocationService.isSeatedAtTable(userstate)) {
+                    if (beaconData.region.identifier ===
+                            TableConstants[this.state.userInfo.table]) {
+                        this.updateDistanceString(beaconData.beacons[0].rssi);
                     }
                 }
             }
         }
+    }
+
+    updateDistanceString(rssi) {
+        const distanceFromBeacon = Math.trunc(BeaconsManager.getBeaconDistance(rssi));
+        let displayStr;
+        if (distanceFromBeacon < 0) {
+            displayStr = ' this beacon\'s location is currently unknown!';
+        } else {
+            displayStr = ` this beacon is currently ${distanceFromBeacon}m away!`
+        }
+
+        this.setState({
+            beaconProximity: displayStr,
+        });
     }
 
     onLogoutPressed() {
@@ -156,24 +173,36 @@ class CustomerView extends Component {
     }
 
     render() {
-        const statusbarMsg = `Welcome to iFC ${this.state.userInfo.user}`;
-        let welcomeMsg = <Text style={styles.info}>However, you're not in the
-              proximity of our foodcourt!</Text>;
+        // Initial states
+        const statusbarMsg = `Welcome to iFC, ${this.state.userInfo.user}`;
+        let welcomeMsg = <Text/>;
         let initialDisplay = <Text/>;
         let orderDisplay = <Text/>;
 
-        if (this.state.userInfo.state !== UserStates.AWAY) {
+        const userstate = this.state.userInfo.state;
+
+        if (LocationService.isAway(userstate)) {
+            welcomeMsg = (<Text style={styles.info}>However, you're not in the
+                  proximity of our foodcourt!</Text>
+                          );
+        } else if (LocationService.isInRange(userstate)) {
             welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
-                this beacon is currently {this.state.beaconProximity}m away!</Text>;
+                {this.state.beaconProximity}</Text>;
+        }
+
+        if (LocationService.isInsideFoodcourt(userstate)) {
             initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
-                userState={this.state.userInfo.state}
+                userState={userstate}
                               />);
         }
 
-        if (this.state.userInfo.state === UserStates.SEATED) {
+        if (LocationService.isSeatedAtTable(userstate)) {
+            const tableName = TableConstants[this.state.userInfo.table];
+            welcomeMsg = <Text style={styles.info}>You can seat yourself at {tableName},
+                {this.state.beaconProximity}</Text>;
             orderDisplay = (<OrderItem isVendor={false}
                 onDone={this.onDone.bind(this)}
-                userState={this.state.userInfo.state}
+                userState={userstate}
                             />);
         }
 

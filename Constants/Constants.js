@@ -10,7 +10,12 @@ export const AppConstants = {
     locate: 'LOCATE',
 };
 
-export default {
+export const TableConstants = {
+    0: 'MsCandy',
+    1: 'DrLemon'
+};
+
+export const DB = {
     userKey: 'user',
     usersTable: 'Users/',
     ordersTable: 'Orders/',

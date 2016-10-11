@@ -6,6 +6,7 @@ import DBService from './DBService';
 import { AppConstants } from '../Constants/Constants';
 
 const BeaconsTable = 'Beacons/';
+const beaconPower = -62; // -74 for low power (-12dB), -62 for hi power (0db)
 
 class BeaconsManager {
     static initializeBeacons() {
@@ -23,7 +24,8 @@ class BeaconsManager {
         Beacons.shouldDropEmptyRanges(true);
     }
 
-    static getBeaconDistance(txPower, rssi) {
+    static getBeaconDistance(rssi) {
+        const txPower = beaconPower;
         if (rssi === 0) {
             return -1.0;
         }

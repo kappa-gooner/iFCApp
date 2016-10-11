@@ -17,7 +17,7 @@ import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
 import Menu from '../Constants/MenuConstants';
-import DB from '../Constants/Constants';
+import { DB } from '../Constants/Constants';
 import Order from '../Models/Order';
 import User from '../Models/User';
 

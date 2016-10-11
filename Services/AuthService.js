@@ -4,7 +4,7 @@ import {
 
 import _ from 'lodash';
 import DBService from './DBService';
-import DB from '../Constants/Constants';
+import { DB } from '../Constants/Constants';
 
 class AuthService {
     getUserInfo(cb) {
