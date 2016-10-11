@@ -74,6 +74,25 @@ const styles = StyleSheet.create({
     listView: {
         flex: 1,
     },
+    statusbar: {
+        backgroundColor: '#fff',
+        height: 22,
+    },
+    navbar: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderBottomColor: '#404040',
+        borderColor: 'transparent',
+        borderWidth: 2,
+        justifyContent: 'center',
+        height: 44,
+        flexDirection: 'row'
+    },
+    navbarTitle: {
+        color: '#444',
+        fontSize: 20,
+        fontWeight: '800',
+    },
 });
 
 export { styles as default };

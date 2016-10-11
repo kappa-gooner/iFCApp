@@ -6,6 +6,7 @@ import {
     TouchableHighlight,
 } from 'react-native';
 
+import Statusbar from './Statusbar';
 import styles from '../Styles/Styles';
 
 class CleanerView extends Component {
@@ -17,9 +18,11 @@ class CleanerView extends Component {
     }
 
     render() {
+        const statusbarMsg = `Welcome back, ${this.props.userInfo.user}`;
+        
         return (
           <View style={styles.container}>
-              <Text style={styles.heading}>Hello {this.props.userInfo.user}</Text>
+              <Statusbar title={statusbarMsg} />
               <Text style={styles.info}>Here are the tables that need to be cleaned:</Text>
               <TouchableHighlight onPress={this.onLogoutPressed.bind(this)}
                   style={styles.logoutButton}

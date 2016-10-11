@@ -11,6 +11,7 @@ import _ from 'lodash';
 
 import styles from '../Styles/Styles';
 import OrderItem from './OrderItem';
+import Statusbar from './Statusbar';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
@@ -98,12 +99,14 @@ class VendorView extends Component {
     }
 
     render() {
+        const statusbarMsg = `Welcome back, ${this.props.userInfo.user}`;
+
         return (
           <View style={styles.container}>
           <ScrollView
               scrollEventThrottle={200}
           >
-              <Text style={styles.heading}>Hello {this.props.userInfo.user}</Text>
+              <Statusbar title={statusbarMsg} />
               <Text style={styles.info}>Here are the orders that have been placed:</Text>
               <ListView
                   dataSource={this.state.dataSource}

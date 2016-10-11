@@ -11,6 +11,7 @@ import {
 import styles from '../Styles/Styles';
 import ItemRow from './ItemRow';
 import OrderItem from './OrderItem';
+import Statusbar from './Statusbar';
 import UserStates from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
@@ -112,7 +113,6 @@ class CustomerView extends Component {
         const userInfo = this.state.userInfo;
         switch (userState) {
         case UserStates.IN_RANGE: {
-            console.log('Finding table!!');
             BeaconsManager.findEmptyTable()
                     .then((freeTable) => {
                         if (freeTable) {
@@ -130,7 +130,6 @@ class CustomerView extends Component {
             break;
         }
         case UserStates.SEATED: {
-            console.log('Handling: ' + UserStates.SEATED);
             // Update 'Orders table'
             orderService.dispatch({
                 type: UserStates.ORDER_PENDING,
@@ -157,6 +156,7 @@ class CustomerView extends Component {
     }
 
     render() {
+        const statusbarMsg = `Welcome to iFC ${this.state.userInfo.user}`;
         let welcomeMsg = <Text style={styles.info}>However, you're not in the
               proximity of our foodcourt!</Text>;
         let initialDisplay = <Text/>;
@@ -182,7 +182,7 @@ class CustomerView extends Component {
             <ScrollView
               scrollEventThrottle={200}
              >
-             <Text style={styles.heading}>Welcome to iFoodCourt {this.state.userInfo.user}</Text>
+             <Statusbar title={statusbarMsg} />
              {welcomeMsg}
              {initialDisplay}
              {orderDisplay}
