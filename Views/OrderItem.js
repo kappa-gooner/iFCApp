@@ -6,9 +6,6 @@ import {
     TouchableHighlight,
     StyleSheet,
 } from 'react-native';
-import _ from 'lodash';
-
-import Menu from '../Constants/MenuConstants';
 
 const styles = StyleSheet.create({
     container: {
@@ -58,19 +55,9 @@ class OrderItem extends Component {
     }
 
     componentWillMount() {
-        if (!this.props.orderItem) {
-            this.setState({
-                order: {
-                    order: _.sample(Menu),
-                    table: -1,
-                    user: '',
-                },
-            });
-        } else {
-            this.setState({
-                order: this.props.orderItem,
-            });
-        }
+        this.setState({
+            order: this.props.orderItem,
+        });
     }
 
     onDonePressed() {
@@ -78,14 +65,21 @@ class OrderItem extends Component {
     }
 
     render() {
-        let tableInfo;
-        if (this.state.order && this.state.order.table < 0) {
-            tableInfo = 'Sample Order';
+        let welcomeText;
+        if (this.props.isVendor) {
+            if (this.state.order && this.state.order.table < 0) {
+                welcomeText = 'Sample Order';
+            } else {
+                welcomeText = `Table #${this.state.order.table}`;
+            }
         } else {
-            tableInfo = `Table #${this.state.order.table}`;
+            if (this.state.order.index === 0) {
+                welcomeText = 'Featured Menu!';
+            } else {
+                welcomeText = `Item #${this.state.order.index}`;
+            }
         }
 
-        const welcomeText = this.props.isVendor ? tableInfo : 'Featured Menu!';
         const orderText = this.props.isVendor ? 'Ready to eat!' : 'Order';
 
         return (
@@ -114,9 +108,7 @@ OrderItem.propTypes = {
     onDone: React.PropTypes.func.isRequired,
     userState: React.PropTypes.string.isRequired,
     isVendor: React.PropTypes.bool.isRequired,
-    orderItem: React.PropTypes.shape({
-
-    }),
+    orderItem: React.PropTypes.shape({})
 };
 
 export default OrderItem;
