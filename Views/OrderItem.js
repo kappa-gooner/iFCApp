@@ -7,7 +7,7 @@ import {
     StyleSheet,
 } from 'react-native';
 
-const styles = StyleSheet.create({
+let styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         borderWidth: 1,
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 20,
-        fontWeight: '300',
+        fontWeight: '400',
         textAlign: 'center'
     },
     doneButton: {
@@ -66,6 +66,10 @@ class OrderItem extends Component {
 
     render() {
         let welcomeText;
+        let backgroundColor = '#fff';
+        let borderWidth = 1;
+        let fontWeight = '100';
+
         if (this.props.isVendor) {
             if (this.state.order && this.state.order.table < 0) {
                 welcomeText = 'Sample Order';
@@ -75,6 +79,9 @@ class OrderItem extends Component {
         } else {
             if (this.state.order.index === 0) {
                 welcomeText = 'Featured Menu!';
+                backgroundColor = '#ffffc9';
+                borderWidth = 2;
+                fontWeight = '200';
             } else {
                 welcomeText = `Item #${this.state.order.index}`;
             }
@@ -83,15 +90,17 @@ class OrderItem extends Component {
         const orderText = this.props.isVendor ? 'Ready to eat!' : 'Order';
 
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor, borderWidth }]}>
                 <Text style={styles.label}>{welcomeText}</Text>
-                <View style={styles.li}>
-                    <Text style={styles.liText}>{this.state.order.order.main}</Text>
+                <View style={[styles.li, { backgroundColor }]}>
+                    <Text style={[styles.liText, { fontWeight }]}>{this.state.order.order.main}
+                    </Text>
                 </View>
-                <View style={styles.li}>
-                    <Text style={styles.liText}>{this.state.order.order.side}</Text>
+                <View style={[styles.li, { backgroundColor }]}>
+                    <Text style={[styles.liText, { fontWeight }]}>{this.state.order.order.side}
+                    </Text>
                 </View>
-                <View style={styles.li}>
+                <View style={[styles.li, { backgroundColor, borderBottomColor: 'transparent', }]}>
                     <TouchableHighlight
                         onPress={this.onDonePressed.bind(this)}
                         style={styles.doneButton}
