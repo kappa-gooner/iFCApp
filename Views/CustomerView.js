@@ -6,7 +6,9 @@ import {
     TouchableHighlight,
     DeviceEventEmitter,
     ScrollView,
+    ListView,
 } from 'react-native';
+import _ from 'lodash';
 
 import styles from '../Styles/Styles';
 import ItemRow from './ItemRow';
@@ -18,6 +20,7 @@ import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
 import LocationService from '../Services/LocationService';
 import Order from '../Models/Order';
+import Menu from '../Constants/MenuConstants';
 import BeaconsManager from '../Services/BeaconsManager';
 import { DB, TableConstants, AppConstants } from '../Constants/Constants';
 
@@ -34,6 +37,7 @@ class CustomerView extends Component {
 
         // Assign base state
         this.state = Object.assign({}, localState, {
+            dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => {} }),
             userInfo: userService.getState(),
         });
     }
@@ -53,6 +57,20 @@ class CustomerView extends Component {
 
         usersRef.on('value', (snap) => {
             this.usersTableUpdated(snap.val());
+        });
+
+        // Menu display
+        const arr = [];
+        let index = 0;
+        _.forIn(_.shuffle(Menu), (value) => {
+            if (index < 11) {
+                arr.push({ order: value, index });
+                index += 1;
+            }
+        });
+
+        this.setState({ // eslint-disable-line react/no-set-state
+            dataSource: this.state.dataSource.cloneWithRows(arr),
         });
     }
 
@@ -232,9 +250,11 @@ class CustomerView extends Component {
             const tableName = TableConstants[this.state.userInfo.table];
             welcomeMsg = <Text style={styles.info}>You can seat yourself at {tableName},
                 {this.state.beaconProximity}</Text>;
-            orderDisplay = (<OrderItem isVendor={false}
-                onDone={this.onDone.bind(this)}
-                userState={userstate}
+            orderDisplay = (<ListView
+                dataSource={this.state.dataSource}
+                enableEmptySections={true}
+                renderRow={this._renderItem.bind(this)}
+                style={styles.listview}
                             />);
         } else if (LocationService.isEating(userstate)) {
             const tableName = TableConstants[this.state.userInfo.table];
@@ -265,6 +285,15 @@ class CustomerView extends Component {
              </TouchableHighlight>
           </ScrollView>
         </View>);
+    }
+
+    _renderItem(item) {
+        return (
+            <OrderItem isVendor={false} onDone={this.onDone.bind(this)}
+                orderItem={item}
+                userState={this.state.userInfo.state}
+            />
+        );
     }
 }
 

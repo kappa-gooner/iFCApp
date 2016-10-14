@@ -20,6 +20,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         marginLeft: 10,
         marginRight: 10,
+        shadowColor: 'black',
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        shadowOffset: {
+            height: 0,
+            width: 0
+        },
     },
     label: {
         fontSize: 20,
@@ -27,7 +34,7 @@ const styles = StyleSheet.create({
     },
     doneButton: {
         borderRadius: 5,
-        backgroundColor: '#EAEAEA',
+        backgroundColor: '#24CE84',
         padding: 5,
     },
 });
@@ -47,8 +54,12 @@ class ItemRow extends Component {
                 <TouchableHighlight
                     onPress={this.onDonePressed.bind(this)}
                     style={styles.doneButton}
+                    underlayColor={'#18a165'}
                 >
-                    <Text>Done</Text>
+                    <Text style={{ textAlign: 'center',
+                                   color: '#fff' }}>
+                                   Done
+                    </Text>
                 </TouchableHighlight>
             </View>
         );
