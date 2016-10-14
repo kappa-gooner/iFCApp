@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
 
 class ItemRow extends Component {
     onDonePressed() {
-        this.props.onDone(this.props.userState);
+        this.props.onDone(this.props.userState, this.props.meta);
     }
 
     render() {
@@ -58,6 +58,7 @@ class ItemRow extends Component {
 ItemRow.propTypes = {
     onDone: React.PropTypes.func.isRequired,
     userState: React.PropTypes.string.isRequired,
+    meta: React.PropTypes.shape({}),
 };
 
 export default ItemRow;

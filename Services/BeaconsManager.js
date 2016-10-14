@@ -3,9 +3,8 @@ import Beacons from 'react-native-ibeacon';
 
 import MyBeacons from '../Constants/BeaconsInfo';
 import DBService from './DBService';
-import { AppConstants } from '../Constants/Constants';
+import { DB, AppConstants } from '../Constants/Constants';
 
-const BeaconsTable = 'Beacons/';
 const beaconPower = -62; // -74 for low power (-12dB), -62 for hi power (0db)
 
 class BeaconsManager {
@@ -60,7 +59,7 @@ class BeaconsManager {
     }
 
     static findEmptyTable() {
-        return DBService.getDB().ref(BeaconsTable).once('value').then((snapshot) => {
+        return DBService.getDB().ref(DB.beaconsTable).once('value').then((snapshot) => {
             const beacons = snapshot.val();
             let freeBeacon;
             Object.keys(beacons).forEach((identifier) => {
@@ -87,7 +86,7 @@ class BeaconsManager {
             const beaconData = beaconInfo;
             beaconData.state = newstate;
 
-            DBService.getDB().ref(BeaconsTable + beaconData.identifier).set({
+            DBService.getDB().ref(DB.beaconsTable + beaconData.identifier).set({
                 identifier: beaconData.identifier,
                 state: beaconData.state,
                 table: beaconData.table,
@@ -103,4 +102,4 @@ class BeaconsManager {
     }
 }
 
-export { BeaconsManager, MyBeacons };
+export { BeaconsManager as default };

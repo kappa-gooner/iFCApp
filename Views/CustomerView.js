@@ -18,7 +18,7 @@ import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
 import LocationService from '../Services/LocationService';
 import Order from '../Models/Order';
-import { BeaconsManager } from '../Services/BeaconsManager';
+import BeaconsManager from '../Services/BeaconsManager';
 import { DB, TableConstants, AppConstants } from '../Constants/Constants';
 
 let usersRef;

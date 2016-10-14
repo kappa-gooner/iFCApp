@@ -20,4 +20,5 @@ export const DB = {
     userKey: 'user',
     usersTable: 'Users/',
     ordersTable: 'Orders/',
+    beaconsTable: 'Beacons/'
 };
