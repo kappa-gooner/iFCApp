@@ -19,6 +19,13 @@ let styles = StyleSheet.create({
         marginBottom: 20,
         marginLeft: 10,
         marginRight: 10,
+        shadowColor: 'black',
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        shadowOffset: {
+            height: 0,
+            width: 0
+        },
     },
     li: {
         backgroundColor: '#fff',
@@ -40,7 +47,7 @@ let styles = StyleSheet.create({
     },
     doneButton: {
         borderRadius: 5,
-        backgroundColor: '#EAEAEA',
+        backgroundColor: '#24CE84',
         padding: 5,
     },
 });
@@ -104,8 +111,12 @@ class OrderItem extends Component {
                     <TouchableHighlight
                         onPress={this.onDonePressed.bind(this)}
                         style={styles.doneButton}
+                        underlayColor={'#18a165'}
                     >
-                        <Text style={{ textAlign: 'center' }}>{orderText}</Text>
+                        <Text style={{ textAlign: 'center',
+                                       color: '#fff' }}>
+                            {orderText}
+                        </Text>
                     </TouchableHighlight>
                 </View>
             </View>
