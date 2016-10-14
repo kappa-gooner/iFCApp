@@ -21,6 +21,10 @@ class LocationService {
     static isSeatedAtTable(userstate) {
         return (userstate === UserStates.SEATED);
     }
+
+    static isEating(userstate) {
+        return (userstate === UserStates.EATING);
+    }
 }
 
 export { LocationService as default };

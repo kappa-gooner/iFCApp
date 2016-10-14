@@ -19,7 +19,7 @@ import DBService from '../Services/DBService';
 import LocationService from '../Services/LocationService';
 import Order from '../Models/Order';
 import { BeaconsManager } from '../Services/BeaconsManager';
-import { DB, TableConstants } from '../Constants/Constants';
+import { DB, TableConstants, AppConstants } from '../Constants/Constants';
 
 let usersRef;
 
@@ -29,7 +29,7 @@ class CustomerView extends Component {
 
         const localState = {
             beaconRegion: '',
-            beaconProximity: 'unknown',
+            beaconProximity: ' this beacon\'s location is currently unknown!',
         };
 
         // Assign base state
@@ -69,7 +69,8 @@ class CustomerView extends Component {
                 beaconRegion: data.region.identifier,
             });
 
-            if (this.state.userInfo.state !== UserStates.IN_RANGE) {
+            // This is triggered only when user is away
+            if (!LocationService.isInRange(this.state.userInfo.state)) {
                 userService.dispatch({
                     type: UserStates.IN_RANGE,
                     user: this.state.userInfo,
@@ -88,17 +89,33 @@ class CustomerView extends Component {
 
     beaconsInRange(beaconData) {
         if (beaconData) {
-            if (beaconData.beacons && beaconData.beacons.length > 0) {
+            if (beaconData.beacons) {
+                // Sort beacons based on signal strength
+                const beacons = beaconData.beacons
+                                .filter(item => item.rssi < 0)
+                                .sort((a, b) =>
+                                    a.rssi - b.rssi
+                                );
+                                // .map(item => item.rssi);
+                const region = beaconData.region;
                 const userstate = this.state.userInfo.state;
-                if (LocationService.isYetToOrder(userstate)) {
-                    if (BeaconsManager.isLocatorBeacon(beaconData.region.identifier)) {
-                        this.enteredRegion(beaconData);
-                        this.updateDistanceString(beaconData.beacons[0].rssi);
-                    }
-                } else if (LocationService.isSeatedAtTable(userstate)) {
-                    if (beaconData.region.identifier ===
-                            TableConstants[this.state.userInfo.table]) {
-                        this.updateDistanceString(beaconData.beacons[0].rssi);
+
+                if (beacons && beacons.length > 0) {
+                    if (LocationService.isYetToOrder(userstate)) {
+                        if (BeaconsManager.isLocatorBeacon(region.identifier)) {
+                            this.enteredRegion(beaconData);
+                            this.updateDistanceString(beacons[0].rssi);
+                        }
+                    } else if (LocationService.isSeatedAtTable(userstate)) {
+                        if (region.identifier ===
+                                TableConstants[this.state.userInfo.table]) {
+                            this.updateDistanceString(beacons[0].rssi);
+                        }
+                    } else if (LocationService.isEating(userstate)) {
+                        if (region.identifier ===
+                                TableConstants[this.state.userInfo.table]) {
+                            this.handleUserEatingDistance(beacons[0].rssi);
+                        }
                     }
                 }
             }
@@ -117,6 +134,26 @@ class CustomerView extends Component {
         this.setState({
             beaconProximity: displayStr,
         });
+    }
+
+    handleUserEatingDistance(rssi) {
+        const distanceFromBeacon = Math.trunc(BeaconsManager.getBeaconDistance(rssi));
+        if (distanceFromBeacon < 4) {
+            this.updateDistanceString(rssi);
+        } else {
+            // Set user to AWAY
+            userService.dispatch({
+                type: UserStates.AWAY,
+                user: this.state.userInfo,
+            });
+            // Set table to 'UNCLEAN'
+            BeaconsManager.updateBeaconTable({
+                table: this.state.userInfo.table,
+                identifier: TableConstants[this.state.userInfo.table],
+                state: AppConstants.occupied,
+                type: AppConstants.reserve,
+            }, AppConstants.unclean);
+        }
     }
 
     onLogoutPressed() {
@@ -181,6 +218,7 @@ class CustomerView extends Component {
 
         const userstate = this.state.userInfo.state;
 
+        // Welcome messages when the user is away or inside the foodcourt
         if (LocationService.isAway(userstate)) {
             welcomeMsg = (<Text style={styles.info}>However, you're not in the
                   proximity of our foodcourt!</Text>
@@ -188,15 +226,7 @@ class CustomerView extends Component {
         } else if (LocationService.isInRange(userstate)) {
             welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
                 {this.state.beaconProximity}</Text>;
-        }
-
-        if (LocationService.isInsideFoodcourt(userstate)) {
-            initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
-                userState={userstate}
-                              />);
-        }
-
-        if (LocationService.isSeatedAtTable(userstate)) {
+        } else if (LocationService.isSeatedAtTable(userstate)) {
             const tableName = TableConstants[this.state.userInfo.table];
             welcomeMsg = <Text style={styles.info}>You can seat yourself at {tableName},
                 {this.state.beaconProximity}</Text>;
@@ -204,6 +234,17 @@ class CustomerView extends Component {
                 onDone={this.onDone.bind(this)}
                 userState={userstate}
                             />);
+        } else if (LocationService.isEating(userstate)) {
+            const tableName = TableConstants[this.state.userInfo.table];
+            welcomeMsg = <Text style={styles.info}>You're enjoying your meal at {tableName},
+                {this.state.beaconProximity}</Text>;
+        }
+
+        // Generic status display when user is inside the foodcourt
+        if (LocationService.isInsideFoodcourt(userstate)) {
+            initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
+                userState={userstate}
+                              />);
         }
 
         return (

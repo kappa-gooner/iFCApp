@@ -6,6 +6,7 @@ export const AppConstants = {
     // Table states
     free: 'FREE',
     occupied: 'OCCUPIED',
+    unclean: 'UNCLEAN',
     reserve: 'RESERVE',
     locate: 'LOCATE',
 };
