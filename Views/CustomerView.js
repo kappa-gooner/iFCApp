@@ -141,11 +141,6 @@ class CustomerView extends Component {
         if (distanceFromBeacon < 4) {
             this.updateDistanceString(rssi);
         } else {
-            // Set user to AWAY
-            userService.dispatch({
-                type: UserStates.AWAY,
-                user: this.state.userInfo,
-            });
             // Set table to 'UNCLEAN'
             BeaconsManager.updateBeaconTable({
                 table: this.state.userInfo.table,
@@ -153,6 +148,13 @@ class CustomerView extends Component {
                 state: AppConstants.occupied,
                 type: AppConstants.reserve,
             }, AppConstants.unclean);
+            // Set user to AWAY
+            userService.dispatch({
+                type: UserStates.AWAY,
+                user: Object.assign(this.state.userInfo, {
+                    table: -1,
+                }),
+            });
         }
     }
 
