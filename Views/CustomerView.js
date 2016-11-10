@@ -231,7 +231,7 @@ class CustomerView extends Component {
 
     render() {
         // Initial states
-        const statusbarMsg = `Welcome to iFC, ${this.state.userInfo.user}`;
+        const statusbarMsg = `Welcome to iFoodCourt, ${this.state.userInfo.user}`;
         let welcomeMsg = <Text/>;
         let initialDisplay = <Text/>;
         let orderDisplay = <Text/>;
