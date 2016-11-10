@@ -14,7 +14,7 @@ import styles from '../Styles/Styles';
 import ItemRow from './ItemRow';
 import OrderItem from './OrderItem';
 import Statusbar from './Statusbar';
-import UserStates from '../Constants/UserStates';
+import  UserStates, { DisplayMessages }  from '../Constants/UserStates';
 import userService from '../Services/UserService';
 import orderService from '../Services/OrderService';
 import DBService from '../Services/DBService';
@@ -32,7 +32,7 @@ class CustomerView extends Component {
 
         const localState = {
             beaconRegion: '',
-            beaconProximity: ' this beacon\'s location is currently unknown!',
+            beaconProximity: ' this place\'s location is currently unknown!',
         };
 
         // Assign base state
@@ -144,9 +144,9 @@ class CustomerView extends Component {
         const distanceFromBeacon = Math.trunc(BeaconsManager.getBeaconDistance(rssi));
         let displayStr;
         if (distanceFromBeacon < 0) {
-            displayStr = ' this beacon\'s location is currently unknown!';
+            displayStr = ' this place\'s location is currently unknown!';
         } else {
-            displayStr = ` this beacon is currently ${distanceFromBeacon}m away!`
+            displayStr = ` this place is currently ${distanceFromBeacon}m away!`
         }
 
         this.setState({
@@ -244,7 +244,7 @@ class CustomerView extends Component {
                   proximity of our foodcourt!</Text>
                           );
         } else if (LocationService.isInRange(userstate)) {
-            welcomeMsg = <Text style={styles.info}>You're in the range of {this.state.beaconRegion},
+            welcomeMsg = <Text style={styles.info}>You're in the range of our foodcourt,
                 {this.state.beaconProximity}</Text>;
         } else if (LocationService.isSeatedAtTable(userstate)) {
             const tableName = TableConstants[this.state.userInfo.table];
@@ -264,8 +264,9 @@ class CustomerView extends Component {
 
         // Generic status display when user is inside the foodcourt
         if (LocationService.isInsideFoodcourt(userstate)) {
+			display = DisplayMessages.hasOwnProperty(userstate) ? DisplayMessages[userstate] : userstate;
             initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
-                userState={userstate}
+                userState={display}
                               />);
         }
 

@@ -13,4 +13,9 @@ const UserStates = KeyMirror({
     ORDER_READY: null,
 });
 
-export { UserStates as default };
+const DisplayMessages = {
+	IN_RANGE: 'Find me a table',
+	EATING: 'Enjoy your meal'
+};
+
+export { UserStates as default, DisplayMessages };
