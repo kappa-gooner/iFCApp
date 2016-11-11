@@ -264,9 +264,8 @@ class CustomerView extends Component {
 
         // Generic status display when user is inside the foodcourt
         if (LocationService.isInsideFoodcourt(userstate)) {
-			display = DisplayMessages.hasOwnProperty(userstate) ? DisplayMessages[userstate] : userstate;
             initialDisplay = (<ItemRow onDone={this.onDone.bind(this)}
-                userState={display}
+                userState={userstate}
                               />);
         }
 

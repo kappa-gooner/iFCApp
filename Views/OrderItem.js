@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import  { TableConstants } from '../Constants/Constants';
 
 import {
     View,
@@ -81,7 +82,7 @@ class OrderItem extends Component {
             if (this.state.order && this.state.order.table < 0) {
                 welcomeText = 'Sample Order';
             } else {
-                welcomeText = `Table #${this.state.order.table}`;
+                welcomeText = `Table ${TableConstants[this.state.order.table]}`;
             }
         } else {
             if (this.state.order.index === 0) {
